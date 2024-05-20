@@ -1,0 +1,224 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String   @id @unique @default(uuid())
+  name       String
+  email      String   @unique
+  password   String
+  role       String   @default("Super-Admin")
+  verified   Boolean  @default(true)
+  contact_no String?  @db.VarChar(11)
+  photolink  String?
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  // attachments Attachments[]
+}
+
+// User roles
+
+model Role {
+  id          Int      @id @unique @default(autoincrement())
+  title       String   @unique
+  permissions String[]
+  createdAt   DateTime @default(now())
+}
+
+// Permissions
+
+model Permissions {
+  id    String @id @unique @default(uuid())
+  title String
+  desc  String
+}
+
+// Transaction type enum
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum TransactionMedium {
+  Bank
+  Cash
+  Other
+}
+
+// transaction 
+
+model Transaction {
+  id                 String            @id @unique @default(uuid())
+  date               String
+  transaction_type   TransactionType
+  amount             Int
+  client             Client?           @relation(fields: [client_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  client_id          String
+  transaction_medium TransactionMedium
+  // Attachments        Attachments[]
+  created_at         DateTime          @default(now())
+}
+
+// Client enum
+
+enum ClientTypeEnum {
+  VISIT
+  STUDY
+  IMMIGRATION
+  OTHER
+}
+
+// Client model
+
+model Client {
+  id                   String          @id @unique @default(uuid())
+  name                 String?
+  clientType           ClientTypeEnum?
+  clientDesc           String?
+  clientEmail          String?         @unique
+  phone_no             String?         @db.VarChar(15)
+  preferredDestination String?
+  dealAmount           Int?            @default(0)
+  due                  Int?            @default(0)
+  recent_update        String?
+  created_at           DateTime        @default(now())
+  // attachments          Attachments[]
+  Transaction          Transaction[]
+}
+
+model Lead {
+  id                   String          @id @unique @default(uuid())
+  name                 String?
+  clientType           ClientTypeEnum?
+  clientDesc           String?
+  clientEmail          String?         @unique
+  phone_no             String?         @db.VarChar(15)
+  preferredDestination String?
+  dealAmount           Int?            @default(0)
+  due                  Int?            @default(0)
+  recent_update        String?
+  created_at           DateTime        @default(now())
+  // attachments          Attachments[]
+}
+
+// Attachment enum type
+enum AttachmentForEnum {
+  USER
+  CLIENT
+  LEADS
+}
+
+// Attachment model
+model Attachments {
+  id         String            @id @unique @default(uuid())
+  title      String
+  desc       String
+  fileLink   String
+  created_at DateTime          @default(now())
+  ownerId    String
+  type       AttachmentForEnum
+  // client      Client            @relation(fields: [ownerId], references: [id], map: "clientAttachments", onUpdate: Cascade, onDelete: Cascade)
+  // user        User              @relation(fields: [ownerId], references: [id], map: "userAttachments", onUpdate: Cascade, onDelete: Cascade)
+  // transaction Transaction       @relation(fields: [ownerId], references: [id], map: "transactionAttachments", onUpdate: Cascade, onDelete: Cascade)
+  // lead        Lead              @relation(fields: [ownerId], references: [id], map: "leadAttachments", onUpdate: Cascade, onDelete: Cascade)
+}
+
+enum QueryStatus {
+  Answered
+  Pending
+}
+
+model Sitemsgquery {
+  id         String      @id @unique @default(uuid())
+  name       String
+  email      String
+  phone_no   String
+  message    String
+  reply      String      @default("")
+  status     QueryStatus @default(Pending)
+  created_at DateTime    @default(now())
+}
+
+model Siteconfig {
+  id                      String  @id @unique @default(uuid())
+  home_banner             String?
+  home_sub_banner         String?
+  cta_title               String?
+  cta_sub_title           String?
+  services_banner         String?
+  services_sub_banner     String?
+  services_banner_content String?
+  uk_office_address       String?
+  uk_office_cell          String?
+  bd_corporate_address    String?
+  bd_corporate_cell       String?
+  bd_legal_address        String?
+  bd_legal_cell           String?
+}
+
+model Homeservice {
+  id                     String  @id @unique @default(uuid())
+  home_service_title     String?
+  home_service_category  String?
+  home_service_site_link String?
+}
+
+model Servicepackage {
+  id                        String  @id @unique @default(uuid())
+  service_package_title     String?
+  service_package_content   String?
+  service_package_imageLink String?
+  storage_imagelink         String? @default("")
+}
+
+model Serviceexpertise {
+  id                        String  @id @unique @default(uuid())
+  service_expertise_title   String?
+  service_expertise_content String?
+}
+
+model Teammember {
+  id                String  @id @unique @default(uuid())
+  member_name       String?
+  member_position   String?
+  member_imagelink  String?
+  storage_imagelink String? @default("")
+}
+
+model Testimonial {
+  id                String  @id @unique @default(uuid())
+  client_name       String?
+  client_address    String?
+  client_rating     Int?
+  client_review     String?
+  client_imagelink  String?
+  storage_imagelink String? @default("")
+}
+
+model Sociallinks {
+  id             String  @id @unique @default(uuid())
+  fb_link        String?
+  youtube_link   String?
+  instagram_link String?
+}
+
+model Email {
+  id         String   @id @unique @default(uuid())
+  email_body String?
+  email_to   String[]
+  email_from String
+  date       DateTime @default(now())
+}
