@@ -15,11 +15,14 @@ class Sitemsgcontroller {
       }
 
       const skip = (page - 1) * limit;
-      const allmsg = await prisma.sitemsgquery.findMany({
-        skip: skip,
-        take: limit,
+      const allAnsweredMsg = await prisma.sitemsgquery.findMany({
+        // skip: skip,
+        // take: limit,
         orderBy: {
           created_at: "desc",
+        },
+        where: {
+          status: "Answered",
         },
       });
       const totalMsg = await prisma.sitemsgquery.count();
@@ -27,17 +30,21 @@ class Sitemsgcontroller {
         where: {
           status: "Pending",
         },
+        orderBy: {
+          created_at: "desc",
+        },
       });
       const totalPages = Math.ceil(totalMsg / limit);
       return res.json({
         status: 200,
-        data: allmsg,
-        metadata: {
-          totalPages,
-          currentPage: page,
-          currentLimit: limit,
-          pending: allPending.length,
-        },
+        data: [...allPending, ...allAnsweredMsg],
+        pending: allPending.length,
+        // metadata: {
+        //   totalPages,
+        //   currentPage: page,
+        //   currentLimit: limit,
+        //   pending: allPending.length,
+        // },
       });
     } catch (error) {
       console.log(error.message);
@@ -79,16 +86,23 @@ class Sitemsgcontroller {
       const validator = vine.compile(querySchema);
 
       const payload = await validator.validate(body);
-      await prisma.sitemsgquery.update({
-        data: payload,
-        where: {
-          id: queryId,
-        },
-      });
-      res.json({
-        status: 201,
-        messages: `Msg id of ${queryId} updated.`,
-      });
+      await prisma.sitemsgquery
+        .update({
+          data: payload,
+          where: {
+            id: queryId,
+          },
+        })
+        .then((data) => {
+          return res.json({
+            status: 201,
+            messages: `Msg id of ${queryId} updated.`,
+            data: data,
+          });
+        })
+        .catch((error) => {
+          throw Error;
+        });
     } catch (error) {
       res.json({
         message: error.message,

@@ -5,6 +5,6 @@ export const querySchema = vine.object({
   email: vine.string(),
   phone_no: vine.string(),
   message: vine.string(),
-
+  reply: vine.string().optional(),
   status: vine.enum(["Answered", "Pending"]).optional(),
 });

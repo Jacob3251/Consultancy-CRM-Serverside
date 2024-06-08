@@ -23,16 +23,11 @@ class RoleController {
           createdAt: "desc",
         },
       });
-      const totalRoles = await prisma.lead.count();
+      const totalRoles = await prisma.role.count();
       const totalPages = Math.ceil(totalRoles / limit);
       return res.json({
         status: 200,
         data: allRoles,
-        metadata: {
-          totalPages,
-          currentPage: page,
-          currentLimit: limit,
-        },
       });
     } catch (error) {
       console.log(error.message);

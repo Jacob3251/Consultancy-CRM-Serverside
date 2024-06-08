@@ -85,33 +85,78 @@ class TestimonialController {
       });
     }
   }
-  //   static async update(req, res) {
-  //     try {
-  //       const attachmentId = req.params.id;
-  //       const data = await prisma.attachments.findUnique({
-  //         where: {
-  //           id: attachmentId,
-  //         },
-  //       });
+  static async update(req, res) {
+    try {
+      const body = req.body;
+      const testimonialId = req.params.id;
+      const testimonialExists = await prisma.testimonial.findUnique({
+        where: {
+          id: testimonialId,
+        },
+      });
+      if (!testimonialExists) {
+        throw Error;
+      }
+      const file = req.file;
+      if (!file) {
+        const validator = vine.compile(testimonialSchema);
+        const payload = await validator.validate(body);
+        await prisma.testimonial
+          .update({
+            data: payload,
+            where: {
+              id: testimonialId,
+            },
+          })
+          .then((data) => {
+            return res.status(200).json({
+              status: 200,
+              message: `Review of ${data.client_name} updated successfully`,
+              data: data,
+            });
+          })
+          .catch((error) => {
+            throw Error;
+          });
+      }
+      if (file) {
+        removeFile(testimonialExists.storage_imagelink);
+        console.log(req.file.path);
+        const testimonialObj = {
+          ...body,
 
-  //       if (data) {
-  //         res.status(200).json({
-  //           message: "Attachment Found",
-  //           data: {
-  //             ...data,
-  //             fileLink: `http://localhost:5000/${data.fileLink.split("\\")[1]}`,
-  //           },
-  //         });
-  //       } else {
-  //         throw Error;
-  //       }
-  //     } catch (error) {
-  //       res.status(400).json({
-  //         message: "Attachment Not Uploaded",
-  //         error: error.message,
-  //       });
-  //     }
-  //   }
+          client_imagelink: `http://localhost:5000/${
+            req.file.path.split("\\")[1]
+          }`,
+        };
+        const validator = vine.compile(testimonialSchema);
+        const payload = await validator.validate(testimonialObj);
+        console.log("payload", payload);
+        const data = await prisma.testimonial.update({
+          data: { ...payload, storage_imagelink: req.file.path },
+          where: {
+            id: testimonialId,
+          },
+        });
+        console.log("data", data);
+        if (data) {
+          res.status(201).json({
+            message: "Testimonial Inserted",
+            data: data,
+          });
+        } else {
+          removeFile(req.file.path);
+          throw Error;
+        }
+      }
+    } catch (error) {
+      console.log(error.message);
+      res.status(400).json({
+        message: "Testimonial Not Added",
+        error: error.message,
+      });
+    }
+  }
   static async delete(req, res) {
     try {
       const testimonialId = req.params.id;

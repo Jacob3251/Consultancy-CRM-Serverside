@@ -49,14 +49,20 @@ class ServiceExpertiseController {
 
       const payload = await validator.validate(body);
 
-      await prisma.serviceexpertise.create({
-        data: payload,
-      });
-
-      return res.json({
-        status: 200,
-        message: "Service Created",
-      });
+      await prisma.serviceexpertise
+        .create({
+          data: payload,
+        })
+        .then((data) => {
+          return res.json({
+            status: 200,
+            message: "Service Created",
+            data: data,
+          });
+        })
+        .catch((error) => {
+          throw Error;
+        });
     } catch (error) {
       res.json({
         message: error.message,

@@ -19,6 +19,89 @@ export async function hasher(value) {
 export function generateToken(data) {
   const { id, email } = data;
   return jwt.sign({ id, email }, process.env.JWT_SECRET, {
-    expiresIn: "1d",
+    expiresIn: "10d",
   });
+}
+export const passMatched = async (old_pass, new_pass) => {
+  const matcher = await bcrypt.compare(old_pass, new_pass);
+  return matcher;
+};
+
+export function generateDataArray(object1, object2) {
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  // Combine data from both objects
+  const combinedData = [...object1, ...object2];
+
+  const clientData = months.map((month) => ({
+    name: month,
+    Clients: 0,
+  }));
+
+  const leadData = months.map((month) => ({
+    name: month,
+    Leads: 0,
+  }));
+
+  object1.forEach((item) => {
+    const date = new Date(item.created_at);
+    const monthName = months[date.getMonth()]; // Get month name from date
+
+    // Find the corresponding month in the result array
+    const monthData = clientData.find((data) => data.name === monthName);
+
+    // Increment Clients and Leads count
+    if (monthData) {
+      monthData.Clients += 1;
+    }
+  });
+
+  object2.forEach((item) => {
+    const date = new Date(item.created_at);
+    const monthName = months[date.getMonth()]; // Get month name from date
+
+    // Find the corresponding month in the result array
+    const monthData = leadData.find((data) => data.name === monthName);
+
+    // Increment Clients and Leads count
+    if (monthData) {
+      monthData.Leads += 1;
+    }
+  });
+
+  // Initialize the result array with months
+  const result = months.map((month) => ({
+    name: month,
+    Clients: clientData.find((item) => item.name === month).Clients,
+    Leads: leadData.find((item) => item.name === month).Leads,
+  }));
+
+  // combinedData.forEach((item) => {
+  //   const date = new Date(item.created_at);
+  //   const monthName = months[date.getMonth()]; // Get month name from date
+
+  //   // Find the corresponding month in the result array
+  //   const monthData = result.find((data) => data.name === monthName);
+
+  //   // Increment Clients and Leads count
+  //   if (monthData) {
+  //     monthData.Clients += 1;
+  //     monthData.Leads += 1; // Assuming each client is also a lead
+  //   }
+  // });
+
+  return result;
 }

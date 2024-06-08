@@ -10,4 +10,12 @@ const basicstorage = multer.diskStorage({
   },
 });
 
-export const upload = multer({ storage: basicstorage });
+export const uploadSingle = multer({
+  storage: basicstorage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+}); //5mb file limit
+
+export const uploadMultiple = multer({
+  storage: basicstorage,
+  limits: { fieldSize: 5 * 1024 * 1024 },
+}); // 5mb per file

@@ -44,9 +44,21 @@ class LeadController {
   }
   static async create(req, res) {
     try {
+      const body = req.body;
+
       const validator = vine.compile(leadSchema);
-      const payload = await validator.validate(req.body);
+      const payload = await validator.validate(body);
       console.log(payload);
+      const found = await prisma.lead.findUnique({
+        where: {
+          clientEmail: payload.clientEmail,
+        },
+      });
+      if (found) {
+        return res.status(400).json({
+          message: "Lead already exists",
+        });
+      }
       await prisma.lead
         .create({
           data: payload,
@@ -62,6 +74,10 @@ class LeadController {
         console.log(error.messages);
         res.json({
           message: error.messages[0].message,
+        });
+      } else {
+        res.status(400).json({
+          message: error.message,
         });
       }
     }
@@ -115,6 +131,21 @@ class LeadController {
   static async delete(req, res) {
     const leadId = req.params.id;
     try {
+      const attachments = await prisma.attachments.findMany({
+        where: {
+          type: "LEADS",
+          ownerId: leadId,
+        },
+      });
+      for (let i = 0; i < attachments.length; i++) {
+        removeFile(attachments[i].fileLink);
+      }
+      await prisma.attachments.deleteMany({
+        where: {
+          type: "LEADS",
+          ownerId: leadId,
+        },
+      });
       await prisma.lead
         .delete({
           where: {

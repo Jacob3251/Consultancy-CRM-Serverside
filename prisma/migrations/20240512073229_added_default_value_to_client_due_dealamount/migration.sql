@@ -1,3 +1,0 @@
--- AlterTable
-ALTER TABLE "Client" ALTER COLUMN "dealAmount" SET DEFAULT 0,
-ALTER COLUMN "due" SET DEFAULT 0;

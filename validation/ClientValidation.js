@@ -10,4 +10,5 @@ export const clientSchema = vine.object({
   recent_update: vine.string().optional(),
   dealAmount: vine.number().optional(),
   due: vine.number().optional(),
+  client_image: vine.string().optional(),
 });

@@ -15,16 +15,17 @@ datasource db {
 }
 
 model User {
-  id         String   @id @unique @default(uuid())
-  name       String
-  email      String   @unique
-  password   String
-  role       String   @default("Super-Admin")
-  verified   Boolean  @default(true)
-  contact_no String?  @db.VarChar(11)
-  photolink  String?
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now())
+  id           String   @id @unique @default(uuid())
+  name         String
+  email        String   @unique
+  password     String
+  role         String   @default("Super-Admin")
+  verified     Boolean  @default(true)
+  contact_no   String?  @db.VarChar(11)
+  photolink    String?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @default(now())
+  storage_link String   @default("")
   // attachments Attachments[]
 }
 
@@ -95,7 +96,7 @@ model Client {
   due                  Int?            @default(0)
   recent_update        String?
   created_at           DateTime        @default(now())
-  // attachments          Attachments[]
+  client_image         String?         @default("")
   Transaction          Transaction[]
 }
 
@@ -111,7 +112,7 @@ model Lead {
   due                  Int?            @default(0)
   recent_update        String?
   created_at           DateTime        @default(now())
-  // attachments          Attachments[]
+  lead_image           String?         @default("")
 }
 
 // Attachment enum type
@@ -216,9 +217,18 @@ model Sociallinks {
 }
 
 model Email {
-  id         String   @id @unique @default(uuid())
-  email_body String?
-  email_to   String[]
-  email_from String
-  date       DateTime @default(now())
+  id                String   @id @unique @default(uuid())
+  email_body        String?
+  email_to          String[]
+  email_from        String
+  email_subject     String
+  email_attachments Json
+  date              DateTime @default(now())
+}
+
+model Registeredemails {
+  id      String @id @unique @default(uuid())
+  email   String @unique
+  app_key String
+  user_id String
 }

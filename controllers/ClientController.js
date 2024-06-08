@@ -1,6 +1,8 @@
 import vine, { errors } from "@vinejs/vine";
 import prisma from "../config/db.config.js";
 import { clientSchema } from "../validation/ClientValidation.js";
+import { response } from "express";
+import { removeFile } from "../utils/helper.js";
 
 class ClientController {
   static async index(req, res) {
@@ -43,28 +45,52 @@ class ClientController {
   static async create(req, res) {
     try {
       const body = req.body;
+      const file = req.file;
       console.log(body);
       const validator = vine.compile(clientSchema);
       const payload = await validator.validate(body);
       console.log("payload =====================", payload);
-
-      await prisma.client
-        .create({
-          data: payload,
-        })
-        .then((data) =>
-          res.status(200).json({
-            message: "Client Created",
-            data: data,
-          })
-        );
-    } catch (error) {
-      if (error instanceof errors.E_VALIDATION_ERROR) {
-        console.log(error.messages);
-        res.status(400).json({
-          message: error.messages[0].message,
+      const found = await prisma.client.findUnique({
+        where: {
+          clientEmail: payload.clientEmail,
+        },
+      });
+      if (found) {
+        console.log("");
+        removeFile(file.path);
+        return res.status(400).json({
+          message: "Client already exists",
         });
       }
+      if (file) {
+        const modifiedPayload = {
+          ...payload,
+          client_image: file.path.split("\\")[1],
+        };
+        const newClient = await prisma.client.create({
+          data: modifiedPayload,
+        });
+        return res.status(200).json({
+          message: "Client Created",
+          data: newClient,
+        });
+      }
+
+      if (!file) {
+        const newClient = await prisma.client.create({
+          data: payload,
+        });
+
+        console.log(newClient);
+        res.status(200).json({
+          message: "Client Created",
+          data: newClient,
+        });
+      }
+    } catch (error) {
+      res.status(400).json({
+        message: error.message,
+      });
     }
   }
   static async show(req, res) {
@@ -75,10 +101,16 @@ class ClientController {
           id: clientId,
         },
       });
+      const attachmentData = await prisma.attachments.findMany({
+        where: {
+          ownerId: clientId,
+          type: "CLIENT",
+        },
+      });
       if (clientData) {
         res.status(200).json({
           message: "Client Found",
-          data: data,
+          data: { ...clientData, attachments: attachmentData },
         });
       } else {
         throw Error;
@@ -118,6 +150,21 @@ class ClientController {
   static async delete(req, res) {
     const clientId = req.params.id;
     try {
+      const attachments = await prisma.attachments.findMany({
+        where: {
+          type: "CLIENT",
+          ownerId: clientId,
+        },
+      });
+      for (let i = 0; i < attachments.length; i++) {
+        removeFile(attachments[i].fileLink);
+      }
+      await prisma.attachments.deleteMany({
+        where: {
+          type: "CLIENT",
+          ownerId: clientId,
+        },
+      });
       await prisma.client
         .delete({
           where: {
