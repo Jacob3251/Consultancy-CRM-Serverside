@@ -13,4 +13,8 @@ app.use(express.static("uploads"));
 // routes
 app.use(routes);
 
+app.get("/", (req, res) => {
+  res.send("Up and running");
+});
+
 app.listen(port, () => console.log(`Server Started on port ${port}`));
