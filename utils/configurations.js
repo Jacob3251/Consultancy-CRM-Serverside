@@ -3,6 +3,10 @@ export const permissionNames = {
     name: "Modify Saved Emails",
     id: "20e647b5-b58b-47ce-a8da-d9c9ce2ea435",
   },
+  MODIFY_OWN_INFO: {
+    name: "Modify Own Info",
+    id: "651b701d-2e2c-4500-b1e1-7a4509d1f065",
+  },
   SEND_NEWSLETTERS: {
     name: "Send Newsletters",
     id: "f433286e-0f99-4cc6-b974-e512f82f3064",

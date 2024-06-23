@@ -18,6 +18,8 @@ import SiteInformationRoutes from "./siteInformationRoutes.js";
 import EmailRoutes from "./emailRoutes.js";
 import RegisteredEmailRoutes from "./registeredEmailRoutes.js";
 import DashboarddataRoutes from "./dashboardDataRoutes.js";
+import CustomPageRoutes from "./customPageRoutes.js";
+import ProgressRoutes from "./progressRoutes.js";
 import { sendEmail } from "../config/mailer.js";
 import { uploadMultiple } from "../middleware/fileMiddleware.js";
 import prisma from "../config/db.config.js";
@@ -45,6 +47,8 @@ router.use("/api/siteInformation", SiteInformationRoutes);
 router.use("/api/email", EmailRoutes);
 router.use("/api/registeredemails", RegisteredEmailRoutes);
 router.use("/api/dashboarddata", DashboarddataRoutes);
+router.use("/api/custompage", CustomPageRoutes);
+router.use("/api/progress", ProgressRoutes);
 
 // test mail route below
 router.post(
@@ -53,6 +57,7 @@ router.post(
   uploadMultiple.array("files", 10),
   async (req, res) => {
     const { from, to, subject, content } = req.body;
+    console.log(req.body);
     const fromEmail = JSON.parse(from);
     // console.log("payload================", subject);
     const attachments = req.files;

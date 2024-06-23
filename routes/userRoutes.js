@@ -9,6 +9,8 @@ import {
 } from "../controllers/UserController.js";
 import { hasher } from "../utils/helper.js";
 import { uploadSingle } from "../middleware/fileMiddleware.js";
+import { verifyPermission } from "../middleware/VerifyMiddleware.js";
+import { permissionNames } from "../utils/configurations.js";
 
 const router = Router();
 
@@ -19,7 +21,11 @@ router.post("/autheticate", authenticate);
 //   console.log(await hasher(req.body.password));
 // });
 // router.get("/", fetchUsers);
-router.get("/:id", getUser);
+router.get(
+  "/:id",
+  verifyPermission(permissionNames.MODIFY_OWN_INFO.id),
+  getUser
+);
 router.put("/:id", uploadSingle.single("file"), updateUser);
 router.delete("/:id", deleteUser);
 

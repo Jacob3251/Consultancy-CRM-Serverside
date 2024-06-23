@@ -232,3 +232,21 @@ model Registeredemails {
   app_key String
   user_id String
 }
+
+model CustomPage {
+  id              String @id @unique @default(uuid())
+  pageTitle       String @default("")
+  siteUrl         String @unique @default("")
+  category        String @default("")
+  metaTitle       String @default("")
+  metaDiscription String @default("")
+  metaKeywords    String @default("")
+  pageData        Json?
+}
+
+model progress {
+  id       String   @id @unique @default(uuid())
+  date     DateTime @default(now())
+  report   String
+  clientId String
+}
