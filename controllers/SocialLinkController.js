@@ -47,6 +47,7 @@ class SocialLinkController {
   static async update(req, res) {
     try {
       const socialsId = req.params.id;
+      console.log("-----------------------", socialsId);
       const body = req.body;
       const validator = vine.compile(socialLinkSchema);
       const payload = await validator.validate(body);
@@ -55,6 +56,7 @@ class SocialLinkController {
           id: socialsId,
         },
       });
+      console.log("++++++++++++++++++++++", found);
       if (found) {
         await prisma.sociallinks
           .update({
@@ -75,6 +77,7 @@ class SocialLinkController {
     } catch (error) {
       res.status(400).json({
         message: "Bad Request",
+        error: error.message,
       });
     }
   }

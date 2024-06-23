@@ -5,25 +5,25 @@ class SiteInformationController {
     const siteConfig = await prisma.siteconfig.findMany();
     const socials = await prisma.sociallinks.findMany();
     const serviceExpertiseData = await prisma.serviceexpertise.findMany({});
-    const visitData = await prisma.customPage?.findMany({
+    const visitData = await prisma.customPage.findMany({
       where: {
         category: "VISIT",
       },
     });
-    const studyData = await prisma.customPage?.findMany({
+    const studyData = await prisma.customPage.findMany({
       where: {
         category: "STUDY",
       },
     });
-    const migrateData = await prisma.customPage?.findMany({
+    const migrateData = await prisma.customPage.findMany({
       where: {
         category: "MIGRATE",
       },
     });
     const data = {
-      visitData: visitData ??  null,
-      studyData: studyData ??  null,
-      migrateData: migrateData ??  null,
+      visitData,
+      studyData,
+      migrateData,
     };
     res.json({
       siteConfigs: siteConfig,
