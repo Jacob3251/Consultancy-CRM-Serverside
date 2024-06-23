@@ -21,9 +21,9 @@ class SiteInformationController {
       },
     });
     const data = {
-      visitData: visitData ?? null,
-      studyData: studyData ?? null,
-      migrateData: migrateData ?? null,
+      visitData: visitData ??  null,
+      studyData: studyData ??  null,
+      migrateData: migrateData ??  null,
     };
     res.json({
       siteConfigs: siteConfig,
