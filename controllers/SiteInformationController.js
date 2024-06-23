@@ -21,9 +21,9 @@ class SiteInformationController {
       },
     });
     const data = {
-      visitData,
-      studyData,
-      migrateData,
+      visitData: visitData ?? null,
+      studyData: studyData ?? null,
+      migrateData: migrateData ?? null,
     };
     res.json({
       siteConfigs: siteConfig,
