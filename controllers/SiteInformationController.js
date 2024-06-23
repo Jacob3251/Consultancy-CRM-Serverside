@@ -2,7 +2,7 @@ import prisma from "../config/db.config.js";
 
 class SiteInformationController {
   static async index(req, res) {
-    console.log(prisma);
+    // console.log(prisma);
     const siteConfig = await prisma.siteconfig.findMany();
     const socials = await prisma.sociallinks.findMany();
     const serviceExpertiseData = await prisma.serviceexpertise.findMany({});
