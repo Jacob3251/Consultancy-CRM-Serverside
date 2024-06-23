@@ -3,7 +3,7 @@ import prisma from "../config/db.config.js";
 import { clientSchema } from "../validation/ClientValidation.js";
 import { response } from "express";
 import { removeFile } from "../utils/helper.js";
-
+console.log(prisma);
 class ClientController {
   static async index(req, res) {
     try {
