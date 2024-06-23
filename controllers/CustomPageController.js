@@ -13,8 +13,9 @@ class CustomPageController {
         });
       }
     } catch (error) {
-      res.status(500).send({
+      res.status(500).json({
         message: "Internal Error",
+        error: error.message,
       });
     }
   }
