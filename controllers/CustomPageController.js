@@ -5,7 +5,7 @@ import { removeFile } from "../utils/helper.js";
 class CustomPageController {
   static async index(req, res) {
     try {
-      const customPages = await prisma.customPage.findMany({});
+      const customPages = await prisma.page.findMany({});
       if (customPages) {
         res.status(200).json({
           message: "custom page data",
@@ -19,17 +19,17 @@ class CustomPageController {
     }
   }
   static async showByCategory(req, res) {
-    const visitData = await prisma.customPage.findMany({
+    const visitData = await prisma.page.findMany({
       where: {
         category: "VISIT",
       },
     });
-    const studyData = await prisma.customPage.findMany({
+    const studyData = await prisma.page.findMany({
       where: {
         category: "STUDY",
       },
     });
-    const migrateData = await prisma.customPage.findMany({
+    const migrateData = await prisma.page.findMany({
       where: {
         category: "MIGRATE",
       },
@@ -47,7 +47,7 @@ class CustomPageController {
   static async show(req, res) {
     try {
       const id = req.params.id;
-      const customPageExists = await prisma.customPage.findUnique({
+      const customPageExists = await prisma.page.findUnique({
         where: {
           siteUrl: id,
         },
@@ -100,7 +100,7 @@ class CustomPageController {
         metaDiscription: newmetaDescription,
         metaKeywords: newmetaKeywords,
       };
-      const pageExists = await prisma.customPage.findUnique({
+      const pageExists = await prisma.page.findUnique({
         where: {
           siteUrl: siteUrl,
         },
@@ -114,7 +114,7 @@ class CustomPageController {
         });
       }
 
-      await prisma.customPage
+      await prisma.page
         .create({
           data: payload,
         })
@@ -150,7 +150,7 @@ class CustomPageController {
   static async delete(req, res) {
     try {
       const id = req.params.id;
-      const pageDatas = await prisma.customPage.findUnique({
+      const pageDatas = await prisma.page.findUnique({
         where: {
           id: id,
         },
@@ -163,7 +163,7 @@ class CustomPageController {
         blogImages.forEach((element) => {
           removeFile(element);
         });
-        await prisma.customPage.delete({
+        await prisma.page.delete({
           where: {
             id: id,
           },

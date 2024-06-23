@@ -233,7 +233,7 @@ model Registeredemails {
   user_id String
 }
 
-model CustomPage {
+model page {
   id              String @id @unique @default(uuid())
   pageTitle       String @default("")
   siteUrl         String @unique @default("")
