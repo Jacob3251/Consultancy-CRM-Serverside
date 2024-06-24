@@ -7,18 +7,18 @@ const router = Router();
 router.get("/", ServiceExpertiseController.index);
 router.post(
   "/",
-  verifyPermission(permissionNames.SITE_MODIFICATION.id),
+  // verifyPermission(permissionNames.SITE_MODIFICATION.id),
   ServiceExpertiseController.create
 );
 router.get("/:id", ServiceExpertiseController.show);
 router.put(
   "/:id",
-  verifyPermission(permissionNames.SITE_MODIFICATION.id),
+  // verifyPermission(permissionNames.SITE_MODIFICATION.id),
   ServiceExpertiseController.update
 );
 router.delete(
   "/:id",
-  verifyPermission(permissionNames.SITE_MODIFICATION.id),
+  // verifyPermission(permissionNames.SITE_MODIFICATION.id),
   ServiceExpertiseController.delete
 );
 

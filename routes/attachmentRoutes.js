@@ -9,7 +9,7 @@ const router = Router();
 router.get("/", AttachmentController.index);
 router.post(
   "/",
-  verifyPermission(permissionNames.MODIFY_CLIENT.id),
+  // verifyPermission(permissionNames.MODIFY_CLIENT.id),
   uploadSingle.single("file"),
   AttachmentController.create
 );
@@ -18,7 +18,7 @@ router.put("/:id", uploadSingle.single("file"), AttachmentController.update);
 router.get("/:id/download", AttachmentController.download);
 router.delete(
   "/:id",
-  verifyPermission(permissionNames.MODIFY_CLIENT.id),
+  // verifyPermission(permissionNames.MODIFY_CLIENT.id),
   AttachmentController.delete
 );
 

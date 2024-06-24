@@ -9,7 +9,7 @@ const router = Router();
 router.get("/", TeamMemberController.index);
 router.post(
   "/",
-  verifyPermission(permissionNames.SITE_MODIFICATION.id),
+  // verifyPermission(permissionNames.SITE_MODIFICATION.id),
   uploadSingle.single("file"),
   TeamMemberController.create
 );
@@ -18,7 +18,7 @@ router.get("/:id", TeamMemberController.show);
 
 router.delete(
   "/:id",
-  verifyPermission(permissionNames.SITE_MODIFICATION.id),
+  // verifyPermission(permissionNames.SITE_MODIFICATION.id),
   TeamMemberController.delete
 );
 

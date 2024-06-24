@@ -7,17 +7,17 @@ const router = Router();
 router.get("/", SocialLinkController.index);
 router.post(
   "/",
-  verifyPermission(permissionNames.SITE_MODIFICATION.id),
+  // verifyPermission(permissionNames.SITE_MODIFICATION.id),
   SocialLinkController.create
 );
 router.put(
   "/:id",
-  verifyPermission(permissionNames.SITE_MODIFICATION.id),
+  // verifyPermission(permissionNames.SITE_MODIFICATION.id),
   SocialLinkController.update
 );
 router.delete(
   "/:id",
-  verifyPermission(permissionNames.SITE_MODIFICATION.id),
+  // verifyPermission(permissionNames.SITE_MODIFICATION.id),
   SocialLinkController.delete
 );
 export default router;

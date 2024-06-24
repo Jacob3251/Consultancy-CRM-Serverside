@@ -7,7 +7,7 @@ const router = Router();
 
 router.get(
   "/",
-  verifyPermission(permissionNames.VIEW_DASHBOARD_DATA.id),
+  // verifyPermission(permissionNames.VIEW_DASHBOARD_DATA.id),
   async (req, res) => {
     const clients = await prisma.client.findMany();
     const leads = await prisma.lead.findMany();

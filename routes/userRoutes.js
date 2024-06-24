@@ -23,7 +23,7 @@ router.post("/autheticate", authenticate);
 // router.get("/", fetchUsers);
 router.get(
   "/:id",
-  verifyPermission(permissionNames.MODIFY_OWN_INFO.id),
+  // verifyPermission(permissionNames.MODIFY_OWN_INFO.id),
   getUser
 );
 router.put("/:id", uploadSingle.single("file"), updateUser);

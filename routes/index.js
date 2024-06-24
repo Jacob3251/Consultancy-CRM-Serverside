@@ -53,7 +53,7 @@ router.use("/api/progress", ProgressRoutes);
 // test mail route below
 router.post(
   "/api/sendemail",
-  verifyPermission(permissionNames.SEND_NEWSLETTERS.id),
+  // verifyPermission(permissionNames.SEND_NEWSLETTERS.id),
   uploadMultiple.array("files", 10),
   async (req, res) => {
     const { from, to, subject, content } = req.body;

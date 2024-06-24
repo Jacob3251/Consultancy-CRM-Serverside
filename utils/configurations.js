@@ -1,70 +1,70 @@
 export const permissionNames = {
   MODIFY_EMAILS: {
     name: "Modify Saved Emails",
-    id: "20e647b5-b58b-47ce-a8da-d9c9ce2ea435",
+    id: "7a0504d8-1d07-46c3-ad5c-8ca58699b4bd",
   },
   MODIFY_OWN_INFO: {
     name: "Modify Own Info",
-    id: "651b701d-2e2c-4500-b1e1-7a4509d1f065",
+    id: "8209e000-cb0f-435e-a9d5-c51f835b058b",
   },
   SEND_NEWSLETTERS: {
     name: "Send Newsletters",
-    id: "f433286e-0f99-4cc6-b974-e512f82f3064",
+    id: "d6c7f6e8-fe23-4200-8630-ede2b4c19313",
   },
   SITE_MODIFICATION: {
     name: "Site Modification",
-    id: "cb18aad3-9bac-4b91-8f52-cad65959fea4",
+    id: "7c661c22-1df1-4c0d-add6-ff2f12a4d118",
   },
   MODIFY_TESTIMONIAL: {
     name: "Modify Testimonials",
-    id: "26cdd8c1-35d0-47d5-b7bc-3d9fdd982ea2",
+    id: "a55e817e-fc7d-4053-a4fc-0fcf1c2e0b71",
   },
   BLOG_MODIFICATION: {
     name: "Blog Modification",
-    id: "729e24cb-6c4d-469f-a679-a9463caa51c8",
+    id: "c405ad03-2f15-4a82-ab55-2d3d43d329fd",
   },
   CREATE_ROLE: {
     name: "Create Roles",
-    id: "95296a16-86bd-4717-b8e7-3b8dc028c682",
+    id: "02f85272-9012-4efb-89e7-59fb8204f105",
   },
   MODIFY_NOTIFICATION: {
     name: "Modify Notifications",
-    id: "dab78a33-98a7-4393-8e9d-df83bf156d52",
+    id: "5e9df550-903d-4c9f-9f0f-27929bb0d8e6",
   },
   MODIFY_LEAD: {
     name: "Modify Leads",
-    id: "f2032af3-7898-4ea6-a8f8-66a9231d43cb",
+    id: "51b52948-fed2-4688-a9a4-538be47ad178",
   },
   MODIFY_CLIENT: {
     name: "Modify Clients",
-    id: "ec87ad29-652a-4bba-85ef-6cb94079bcc8",
+    id: "1308a6fe-b804-4d93-b2ff-99e613435188",
   },
   USER_MODIFICATION: {
     name: "User Modification",
-    id: "6f340a96-a114-4724-811e-07d0445356e9",
+    id: "d00559a0-41d7-4e2a-a3c6-395978034efd",
   },
   VIEW_DASHBOARD_DATA: {
     name: "View Dashboard Data",
-    id: "9aacc911-4680-483e-903d-431f2b0a4a88",
+    id: "ef164a67-1344-4bcd-93a6-5f0f8980fcb0",
   },
   VIEW_CLIENTS: {
     name: "View Clients",
-    id: "35594e85-6669-4c64-8682-a2b2f4365ad9",
+    id: "d4fff4f7-673f-45fb-be3e-631aca0a089a",
   },
   VIEW_LEADS: {
     name: "View Leads",
-    id: "79ac7048-42ec-43c6-a414-a5dfd1ed1e48",
+    id: "8f0a1dc2-be73-45a7-bbb8-44b1d58b164f",
   },
   VIEW_SENT_NEWSLETTERS: {
     name: "View Sent Newsletters",
-    id: "91a6ff40-accd-4df6-9c66-b9aef584ba33",
+    id: "16c48d90-9e60-4c9a-8d3e-4f6d71f05b35",
   },
   MODIFY_SENT_NEWSLETTERS: {
     name: "Modify Sent Newsletters",
-    id: "4dbe6499-0ec5-44a9-894e-eda77c0bbf38",
+    id: "2bc8c5a9-2751-45a5-9284-c7f088f25cd0",
   },
   VIEW_ROLES: {
     name: "View Roles",
-    id: "c1d7c490-f901-4965-bd82-c7bdce908b74",
+    id: "66f7023c-4785-43de-bcef-3c0b5a762cb3",
   },
 };
