@@ -3,9 +3,10 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 // for removing the file stored in the storage
 export function removeFile(fileLocation) {
-  const fileAddress = fileLocation.split("upload/")[1];
+  const fileAddress = fileLocation.split("uploads/")[1];
   const path = "uploads\\";
-  return fs.unlinkSync(path.concat(fileAddress));
+  const path1 = path.concat(fileAddress);
+  return fs.unlinkSync(path1);
 }
 
 // for hashing
