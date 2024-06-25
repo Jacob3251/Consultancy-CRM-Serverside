@@ -10,8 +10,8 @@ export function removeFile(fileLocation) {
 
     // Check if file exists before attempting to delete
     if (fs.existsSync(fullPath)) {
-      fs.unlinkSync(fullPath);
       console.log(`File ${fileLocation} deleted successfully`);
+      return fs.unlinkSync(fullPath);
     } else {
       console.log(`File ${fileLocation} does not exist, skipping deletion`);
     }
