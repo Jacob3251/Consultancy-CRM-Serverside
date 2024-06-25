@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 export function removeFile(fileLocation) {
   const fileAddress = fileLocation.split("uploads/")[1];
   const path = "uploads\\";
+  console.log("render directory address", process.cwd());
   const path1 = path.concat(fileAddress);
   return fs.unlinkSync(path1);
 }
