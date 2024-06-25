@@ -3,11 +3,22 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 // for removing the file stored in the storage
 export function removeFile(fileLocation) {
-  const fileAddress = fileLocation.split("uploads/")[1];
-  const path = "uploads\\";
   console.log("render directory address", process.cwd());
-  const path1 = path.concat(fileAddress);
-  return fs.unlinkSync(path1);
+  try {
+    // Construct the full path
+    const fullPath = path.join(process.cwd(), fileLocation);
+
+    // Check if file exists before attempting to delete
+    if (fs.existsSync(fullPath)) {
+      fs.unlinkSync(fullPath);
+      console.log(`File ${fileLocation} deleted successfully`);
+    } else {
+      console.log(`File ${fileLocation} does not exist, skipping deletion`);
+    }
+  } catch (error) {
+    console.error(`Error handling file ${fileLocation}:`, error);
+    // You might want to handle or log this error, but not throw it
+  }
 }
 
 // for hashing
