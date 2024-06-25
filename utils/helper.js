@@ -1,9 +1,17 @@
 import fs from "fs";
+import path from "path";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 // for removing the file stored in the storage
 export function removeFile(fileLocation) {
-  return fs.unlinkSync(fileLocation);
+  try {
+    const fullPath = path.join(process.cwd(), fileLocation);
+    fs.unlinkSync(fullPath);
+    console.log(`File ${fileLocation} deleted successfully`);
+  } catch (error) {
+    console.error(`Error deleting file ${fileLocation}:`, error);
+    throw error; // Re-throw the error if you want to handle it in the calling function
+  }
 }
 
 // for hashing
