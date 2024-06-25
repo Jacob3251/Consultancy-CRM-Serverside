@@ -151,11 +151,13 @@ class CustomPageController {
   static async delete(req, res) {
     try {
       const id = req.params.id;
+      console.log("page delete id+++++++++++++", id);
       const pageDatas = await prisma.page.findUnique({
         where: {
           id: id,
         },
       });
+      console.log("delete controller page++++++++++++", pageDatas);
       if (pageDatas) {
         const page = JSON.parse(pageDatas.pageData);
         const bannerImage = page.pageHeading.banner;

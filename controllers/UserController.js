@@ -157,6 +157,7 @@ export const updateUser = async (req, res) => {
     }
 
     const file = req.file;
+    console.log("User Photo link++++++++++", file);
 
     const validator = vine.compile(userSchma);
     if (!file) {
@@ -166,9 +167,10 @@ export const updateUser = async (req, res) => {
         if (temp) {
           updatedPass = await hasher(body.new_password);
         } else {
-          return res.status(400).json({
-            message: "You've entered incorrect old password",
-          });
+          throw new Error();
+          // return res.status(400).json({
+          //   message: "You've entered incorrect old password",
+          // });
         }
       } else {
         updatedPass = userExists.password;
@@ -199,7 +201,7 @@ export const updateUser = async (req, res) => {
             // verified: data.verified,
             // contact_no: data.contact_no,
           };
-          return res.status(200).json({
+          res.status(200).json({
             email: data.email,
             data: userData,
             token: generateToken(data),
@@ -235,7 +237,7 @@ export const updateUser = async (req, res) => {
         const payload = validator.validate(updatedData);
         const modifiedPayload = {
           ...payload,
-          storage_link: file.path.split("\\")[1],
+          storage_link: file.path,
         };
 
         await prisma.user
@@ -274,9 +276,10 @@ export const updateUser = async (req, res) => {
           if (temp) {
             updatedPass = body.new_password;
           } else {
-            return res.status(400).json({
-              message: "You've entered incorrect old password",
-            });
+            throw new Error();
+            // return res.status(400).json({
+            //   message: "You've entered incorrect old password",
+            // });
           }
         } else {
           updatedPass = userExists.password;
@@ -290,7 +293,7 @@ export const updateUser = async (req, res) => {
         const payload = validator.validate(updatedData);
         const modifiedPayload = {
           ...payload,
-          storage_link: file.path.split("\\")[1],
+          storage_link: file.path,
         };
 
         await prisma.user
@@ -310,7 +313,7 @@ export const updateUser = async (req, res) => {
               contact_no: data.contact_no,
               storage_link: data.storage_link,
             };
-            return res.status(200).json({
+            res.status(200).json({
               email: data.email,
               data: userData,
               token: generateToken(data),
@@ -322,7 +325,7 @@ export const updateUser = async (req, res) => {
       }
     }
   } catch (error) {
-    return res.status(400).json({
+    res.status(400).json({
       messaage: "Couldn't update user",
       error: error.messaage,
     });
