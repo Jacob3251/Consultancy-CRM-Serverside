@@ -5,6 +5,7 @@ export const leadSchema = vine.object({
   clientType: vine.enum(["VISIT", "STUDY", "IMMIGRATION", "OTHER"]).optional(),
   clientDesc: vine.string().optional(),
   clientEmail: vine.string().optional(),
+  lead_address: vine.string().optional(),
   phone_no: vine.string().minLength(11).maxLength(15),
   preferredDestination: vine.string().optional(),
   dealAmount: vine.number().optional(),

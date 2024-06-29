@@ -57,19 +57,28 @@ class PermissionController {
         data: payload,
       });
 
-      return res.json({
-        status: 200,
-        message: "Permission Created",
-      });
       if (createdRole) {
         console.log("done");
-        // res.status(200).json({
-        //   message: "Pemission Found",
-        //   createdRole: createdRole,
-        // });
-      } else {
-        console.log("notDone");
-        throw Error;
+        const superRole = await prisma.role.findUnique({
+          where: {
+            title: "Super-Admin",
+          },
+        });
+        if (superRole) {
+          const existingPermissions = superRole.permissions;
+          const modifiedPermissions = [...existingPermissions, createdRole.id];
+          await prisma.role.update({
+            data: { ...superRole, permissions: modifiedPermissions },
+            where: {
+              id: superRole.id,
+            },
+          });
+        }
+
+        return res.json({
+          status: 200,
+          message: "Permission Created",
+        });
       }
     } catch (error) {
       //   if (error instanceof errors.E_VALIDATION_ERROR) {

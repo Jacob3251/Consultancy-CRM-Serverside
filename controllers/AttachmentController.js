@@ -4,6 +4,7 @@ import multer, { diskStorage } from "multer";
 import { attachmentSchema } from "../validation/AttachmentValidation.js";
 import { messages } from "@vinejs/vine/defaults";
 import { removeFile } from "../utils/helper.js";
+import { deleteFile, uploadFile } from "../utils/cloudinary.js";
 class AttachmentController {
   static async index(req, res) {
     try {
@@ -36,23 +37,33 @@ class AttachmentController {
         desc,
         ownerId,
         type,
-        fileLink: req.file.path,
       };
       console.log(attachmentObj);
       const validator = vine.compile(attachmentSchema);
       const payload = await validator.validate(attachmentObj);
+      const resultFile = await uploadFile(file.path);
+      const stringified = JSON.stringify(resultFile);
+      const modifiedPayload = { ...payload, fileLink: stringified };
       console.log("payload", payload);
       const attachmentdata = await prisma.attachments.create({
-        data: payload,
+        data: modifiedPayload,
       });
       console.log("data", attachmentdata);
       if (attachmentdata) {
-        res.status(201).json({
+        return res.status(201).json({
           message: "Attachment Inserted",
           data: attachmentdata,
         });
       } else {
-        removeFile(req.file.path);
+        try {
+          deleteFile(resultFile);
+        } catch (deleteError) {
+          console.error("Error deleting file:", deleteError);
+          return res.status(500).json({
+            message: "Error deleting file",
+            error: deleteError.message,
+          });
+        }
         throw Error;
       }
     } catch (error) {
@@ -81,6 +92,16 @@ class AttachmentController {
       if (!attachmentExists) {
         throw Error;
       }
+      try {
+        deleteFile(JSON.parse(attachmentExists.fileLink));
+      } catch (deleteError) {
+        console.error("Error deleting file:", deleteError);
+        return res.status(500).json({
+          message: "Error deleting file",
+          error: deleteError.message,
+        });
+      }
+      const file = req.file;
 
       removeFile(attachmentExists.fileLink);
       await prisma.attachments
@@ -138,20 +159,28 @@ class AttachmentController {
           id: attachmentId,
         },
       });
-      const removeFile = removeFile(data.fileLink);
-      if (removeFile) {
-        await prisma.attachments
-          .delete({
-            where: {
-              id: attachmentId,
-            },
-          })
-          .then(() =>
-            res.status(200).json({
-              message: "Attachment deleted",
-            })
-          );
+      const parsedFileLink = JSON.parse(data.fileLink);
+      try {
+        deleteFile(parsedFileLink);
+      } catch (deleteError) {
+        console.error("Error deleting file:", deleteError);
+        return res.status(500).json({
+          message: "Error deleting file",
+          error: deleteError.message,
+        });
       }
+
+      await prisma.attachments
+        .delete({
+          where: {
+            id: attachmentId,
+          },
+        })
+        .then(() =>
+          res.status(200).json({
+            message: "Attachment deleted",
+          })
+        );
     } catch (error) {
       res.status(400).json({
         message: "Couldn't Delete Attachment",

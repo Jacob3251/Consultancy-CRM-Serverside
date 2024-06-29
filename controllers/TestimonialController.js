@@ -2,6 +2,7 @@ import vine from "@vinejs/vine";
 import prisma from "../config/db.config.js";
 import { testimonialSchema } from "../validation/TestimonialValidation.js";
 import { removeFile } from "../utils/helper.js";
+import { deleteFile, uploadFile } from "../utils/cloudinary.js";
 
 class TestimonialController {
   static async index(req, res) {
@@ -54,19 +55,19 @@ class TestimonialController {
       if (!file) {
         throw Error;
       }
-      console.log(req.file.path);
+      const resultFile = await uploadFile(file.path);
+      // console.log(req.file.path);
       const testimonialObj = {
         ...body,
 
-        client_imagelink: `http://localhost:5000/${
-          req.file.path.split("\\")[1]
-        }`,
+        client_imagelink: resultFile.url,
       };
       const validator = vine.compile(testimonialSchema);
       const payload = await validator.validate(testimonialObj);
       console.log("payload", payload);
+      const stringified = JSON.stringify(resultFile);
       const data = await prisma.testimonial.create({
-        data: { ...payload, storage_imagelink: req.file.path },
+        data: { ...payload, storage_imagelink: stringified },
       });
       console.log("data", data);
       if (data) {
@@ -75,8 +76,15 @@ class TestimonialController {
           data: data,
         });
       } else {
-        removeFile(req.file.path);
-        throw Error;
+        try {
+          deleteFile(resultFile);
+        } catch (deleteError) {
+          console.error("Error deleting file:", deleteError);
+          return res.status(500).json({
+            message: "Error deleting file",
+            error: deleteError.message,
+          });
+        }
       }
     } catch (error) {
       res.status(400).json({
@@ -120,32 +128,50 @@ class TestimonialController {
           });
       }
       if (file) {
-        removeFile(testimonialExists.storage_imagelink);
-        console.log(req.file.path);
+        console.log("testimonialExists +++++++++++++", testimonialExists);
+        const parsedStorage_link = JSON.parse(
+          testimonialExists.storage_imagelink
+        );
+        console.log("Parsed previous storage link", parsedStorage_link);
+        try {
+          deleteFile(parsedStorage_link);
+        } catch (deleteError) {
+          console.error("Error deleting file:", deleteError);
+          return res.status(500).json({
+            message: "Error deleting file",
+            error: deleteError.message,
+          });
+        }
+        const resultFile = await uploadFile(file.path);
         const testimonialObj = {
           ...body,
 
-          client_imagelink: `http://localhost:5000/${
-            req.file.path.split("\\")[1]
-          }`,
+          client_imagelink: resultFile.url,
         };
         const validator = vine.compile(testimonialSchema);
         const payload = await validator.validate(testimonialObj);
         console.log("payload", payload);
+        const stringified = JSON.stringify(resultFile);
+        const modified_payload = {
+          ...payload,
+          client_imagelink: resultFile.url,
+          storage_imagelink: stringified,
+        };
+        console.log(modified_payload);
         const data = await prisma.testimonial.update({
-          data: { ...payload, storage_imagelink: req.file.path },
+          data: modified_payload,
           where: {
             id: testimonialId,
           },
         });
-        console.log("data", data);
+        console.log("updated data", data);
         if (data) {
           res.status(201).json({
             message: "Testimonial Inserted",
             data: data,
           });
         } else {
-          removeFile(req.file.path);
+          deleteFile(resultFile);
           throw Error;
         }
       }
@@ -166,8 +192,18 @@ class TestimonialController {
         },
       });
       console.log(data);
-      removeFile(data.storage_imagelink);
+      const parsedData = JSON.parse(data.storage_imagelink);
+      console.log("delete testimonial", parsedData);
 
+      try {
+        deleteFile(parsedData);
+      } catch (deleteError) {
+        console.error("Error deleting file:", deleteError);
+        return res.status(500).json({
+          message: "Error deleting file",
+          error: deleteError.message,
+        });
+      }
       await prisma.testimonial
         .delete({
           where: {

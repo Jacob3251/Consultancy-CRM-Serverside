@@ -2,6 +2,7 @@ import vine, { errors } from "@vinejs/vine";
 import prisma from "../config/db.config.js";
 import { emailSchema } from "../validation/EmailValidation.js";
 import { removeFile } from "../utils/helper.js";
+import { deleteFile } from "../utils/cloudinary.js";
 
 class EmailController {
   static async index(req, res) {
@@ -107,8 +108,18 @@ class EmailController {
       if (email) {
         const emailAttachments = JSON.parse(email.email_attachments);
         console.log(emailAttachments);
-        for (let i = 0; i < emailAttachments.length; i++) {
-          removeFile(emailAttachments[i].path);
+        if (emailAttachments.length > 0) {
+          for (let i = 0; i < emailAttachments.length; i++) {
+            try {
+              deleteFile(emailAttachments[i]);
+            } catch (deleteError) {
+              console.error("Error deleting file:", deleteError);
+              return res.status(500).json({
+                message: "Error deleting file",
+                error: deleteError.message,
+              });
+            }
+          }
         }
         await prisma.email
           .delete({

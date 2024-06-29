@@ -29,6 +29,7 @@ router.get(
 ); //Get individual client by id
 router.put(
   "/:id/update",
+  uploadSingle.single("file"),
   // verifyPermission(permissionNames.MODIFY_CLIENT.id),
   ClientController.update
 ); //Update individual client by id

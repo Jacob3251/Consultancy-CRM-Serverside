@@ -1,6 +1,7 @@
 import { messages } from "@vinejs/vine/defaults";
 import prisma from "../config/db.config.js";
-import { removeFile } from "../utils/helper.js";
+import { cloudRestrictor, removeFile } from "../utils/helper.js";
+import cloudinary, { deleteFile, uploadFile } from "../utils/cloudinary.js";
 
 class CustomPageController {
   static async index(req, res) {
@@ -54,9 +55,28 @@ class CustomPageController {
         },
       });
       if (customPageExists) {
+        const parsedData = JSON.parse(customPageExists.pageData);
+        // console.log("parsed", parsedData);
+        const modifiedData = {
+          ...parsedData,
+          pageHeading: {
+            title: parsedData.pageHeading.title,
+            description: parsedData.pageHeading.description,
+            banner: cloudRestrictor(parsedData.pageHeading.banner),
+          },
+          pageDetail: {
+            title: parsedData.pageDetail.title,
+            description: parsedData.pageDetail.description,
+            images: [
+              cloudRestrictor(parsedData.pageDetail.images[0]),
+              cloudRestrictor(parsedData.pageDetail.images[1]),
+            ],
+          },
+        };
+        // console.log("modified", modifiedData);
         res.status(200).json({
           message: "Custom Page Found",
-          data: customPageExists,
+          data: { ...customPageExists, pageData: modifiedData },
         });
       }
     } catch (error) {
@@ -67,8 +87,8 @@ class CustomPageController {
   }
   static async create(req, res) {
     const file = req.files;
+    console.log(file);
     const body = req.body;
-    // const { files, ...rest } = body;
     const {
       title,
       category,
@@ -86,14 +106,27 @@ class CustomPageController {
     const { pageHeading, pageDetail } = newpageData;
     const newmetaDescription = JSON.parse(metaDescription);
     const newmetaKeywords = JSON.parse(metaKeywords);
-    console.log(req.files);
+    // console.log(req.files);
+    const result = await uploadFile(file[0]?.path);
+    const result1 = await uploadFile(file[1]?.path);
+    const result2 = await uploadFile(file[2]?.path);
+
     try {
       const payload = {
         pageTitle: newtitle,
         pageData: JSON.stringify({
           ...newpageData,
-          pageHeading: { ...pageHeading, banner: file[0].path },
-          pageDetail: { ...pageDetail, images: [file[1].path, file[2].path] },
+          pageHeading: {
+            ...pageHeading,
+            banner: { fileLink: result.url, fileInfo: { ...result } },
+          },
+          pageDetail: {
+            ...pageDetail,
+            images: [
+              { fileLink: result1.url, fileInfo: { ...result1 } },
+              { fileLink: result2.url, fileInfo: { ...result2 } },
+            ],
+          },
         }),
         siteUrl: newsiteUrl,
         category: newcategory,
@@ -108,7 +141,7 @@ class CustomPageController {
       });
 
       if (pageExists) {
-        file.map((item) => removeFile(item.file.path));
+        // file.map((item) => removeFile(item.file.path));
         return res.status(401).json({
           message: "Site with same url exists",
           error: error.message,
@@ -126,7 +159,7 @@ class CustomPageController {
           });
         })
         .catch((error) => {
-          file.map((item) => removeFile(item.file.path));
+          // file.map((item) => removeFile(item.file.path));
           res.status(401).json({
             message: "Error while creating data",
             error: error.message,
@@ -151,21 +184,28 @@ class CustomPageController {
   static async delete(req, res) {
     try {
       const id = req.params.id;
-      console.log("page delete id+++++++++++++", id);
+      // console.log("page delete id+++++++++++++", id);
       const pageDatas = await prisma.page.findUnique({
         where: {
           id: id,
         },
       });
-      console.log("delete controller page++++++++++++", pageDatas);
+      // console.log("delete controller page++++++++++++", pageDatas);
       if (pageDatas) {
         const page = JSON.parse(pageDatas.pageData);
-        const bannerImage = page.pageHeading.banner;
-        const blogImages = page.pageDetail.images;
-        removeFile(bannerImage);
-        blogImages.forEach((element) => {
-          removeFile(element);
-        });
+        console.log("delete controller page++++++++++++", page);
+        console.log(page.pageHeading.banner.fileInfo);
+        try {
+          deleteFile(page.pageHeading.banner.fileInfo);
+          deleteFile(page.pageDetail.images[0].fileInfo);
+          deleteFile(page.pageDetail.images[1].fileInfo);
+        } catch (deleteError) {
+          console.error("Error deleting file:", deleteError);
+          return res.status(500).json({
+            message: "Error deleting file",
+            error: deleteError.message,
+          });
+        }
         await prisma.page.delete({
           where: {
             id: id,

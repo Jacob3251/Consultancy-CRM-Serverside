@@ -1,12 +1,12 @@
 import multer from "multer";
 
 const basicstorage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    return cb(null, "./uploads");
-  },
+  // destination: function (req, file, cb) {
+  //   return cb(null, file.originalname);
+  // },
   filename: function (req, file, cb) {
     // console.log(file);
-    return cb(null, `${Date.now()}-${file.originalname}`);
+    return cb(null, `aviate ${file.originalname}`);
   },
 });
 

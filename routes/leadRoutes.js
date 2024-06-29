@@ -2,6 +2,7 @@ import { Router } from "express";
 import LeadController from "../controllers/LeadController.js";
 import { verifyPermission } from "../middleware/VerifyMiddleware.js";
 import { permissionNames } from "../utils/configurations.js";
+import { uploadSingle } from "../middleware/fileMiddleware.js";
 
 const router = Router();
 
@@ -13,6 +14,7 @@ router.get(
 router.post(
   "/",
   // verifyPermission(permissionNames.MODIFY_LEAD.id),
+  uploadSingle.single("file"),
   LeadController.create
 );
 router.get(
@@ -23,6 +25,7 @@ router.get(
 router.put(
   "/:id/update",
   // verifyPermission(permissionNames.MODIFY_LEAD.id),
+  uploadSingle.single("file"),
   LeadController.update
 );
 router.delete(

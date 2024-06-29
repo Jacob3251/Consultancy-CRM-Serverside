@@ -26,6 +26,7 @@ import prisma from "../config/db.config.js";
 import { generateDataArray } from "../utils/helper.js";
 import { verifyPermission } from "../middleware/VerifyMiddleware.js";
 import { permissionNames } from "../utils/configurations.js";
+import { uploadFile } from "../utils/cloudinary.js";
 const router = Router();
 
 router.use("/api/user", UserRoutes);
@@ -83,20 +84,27 @@ router.post(
         filename: file.originalname,
         path: file.path,
       }));
-
+      const uploadedAttachmentArr = await Promise.all(
+        attachments.map(async (element) => {
+          const resultFile = await uploadFile(element.path);
+          console.log("file uploaded", element.originalname);
+          return resultFile;
+        })
+      );
+      console.log("uploadedAttachment array", uploadedAttachmentArr);
       const emailObject = {
         email_body: content,
         email_to: JSON.parse(to),
         email_from: fromEmail.email,
         email_subject: subject,
-        email_attachments: JSON.stringify(attachmentData),
+        email_attachments: JSON.stringify(uploadedAttachmentArr),
       };
       await prisma.email
         .create({
           data: emailObject,
         })
         .then((data) => {
-          res.status(201).json({
+          return res.status(201).json({
             data: data,
             message: "Email Sent",
           });

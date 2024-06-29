@@ -6,6 +6,7 @@ import {
   fetchUsers,
   getUser,
   updateUser,
+  updateUserInfo,
 } from "../controllers/UserController.js";
 import { hasher } from "../utils/helper.js";
 import { uploadSingle } from "../middleware/fileMiddleware.js";
@@ -26,7 +27,9 @@ router.get(
   // verifyPermission(permissionNames.MODIFY_OWN_INFO.id),
   getUser
 );
-router.put("/:id", uploadSingle.single("file"), updateUser);
+router.put("/:id", uploadSingle.single("file"), updateUserInfo);
 router.delete("/:id", deleteUser);
+// for updating other users
+router.put("/:id/update", uploadSingle.single("file"), updateUser);
 
 export default router;

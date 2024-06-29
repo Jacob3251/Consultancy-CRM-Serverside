@@ -26,7 +26,7 @@ model User {
   photolink    String?
   created_at   DateTime @default(now())
   updated_at   DateTime @default(now())
-  storage_link String   @default("")
+  storage_link Json?
   // attachments Attachments[]
 }
 
@@ -87,17 +87,18 @@ enum ClientTypeEnum {
 
 model Client {
   id                   String          @id @unique @default(uuid())
-  name                 String?
+  name                 String?         @default("")
   clientType           ClientTypeEnum?
-  clientDesc           String?
+  clientDesc           String?         @default("")
   clientEmail          String?         @unique
   phone_no             String?         @db.VarChar(15)
-  preferredDestination String?
+  preferredDestination String?         @default("")
   dealAmount           Int?            @default(0)
   due                  Int?            @default(0)
-  recent_update        String?
+  recent_update        String?         @default("")
   created_at           DateTime        @default(now())
-  client_image         String?         @default("")
+  client_image         Json?
+  client_address       String?         @default("")
   Transaction          Transaction[]
 }
 
@@ -114,6 +115,7 @@ model Lead {
   recent_update        String?
   created_at           DateTime        @default(now())
   lead_image           String?         @default("")
+  lead_address         String?         @default("")
 }
 
 // Attachment enum type
@@ -128,7 +130,7 @@ model Attachments {
   id         String            @id @unique @default(uuid())
   title      String
   desc       String
-  fileLink   String
+  fileLink   Json
   created_at DateTime          @default(now())
   ownerId    String
   type       AttachmentForEnum
@@ -183,7 +185,7 @@ model Servicepackage {
   service_package_title     String?
   service_package_content   String?
   service_package_imageLink String?
-  storage_imagelink         String? @default("")
+  storage_imagelink         Json?
 }
 
 model Serviceexpertise {
@@ -197,7 +199,7 @@ model Teammember {
   member_name       String?
   member_position   String?
   member_imagelink  String?
-  storage_imagelink String? @default("")
+  storage_imagelink Json?
 }
 
 model Testimonial {
@@ -207,7 +209,7 @@ model Testimonial {
   client_rating     Int?
   client_review     String?
   client_imagelink  String?
-  storage_imagelink String? @default("")
+  storage_imagelink Json?
 }
 
 model Sociallinks {

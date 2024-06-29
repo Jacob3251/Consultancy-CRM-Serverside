@@ -1,6 +1,12 @@
 import fs from "fs";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+
+export function cloudRestrictor(cloudObject) {
+  const { fileLink, fileInfo } = cloudObject;
+  return fileLink;
+}
+
 // for removing the file stored in the storage
 export function removeFile(fileLocation) {
   console.log("render directory address", process.cwd());

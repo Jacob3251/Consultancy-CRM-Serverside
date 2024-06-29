@@ -2,6 +2,7 @@ import vine from "@vinejs/vine";
 import prisma from "../config/db.config.js";
 import { teamMemberSchema } from "../validation/TeamMemberValidation.js";
 import { removeFile } from "../utils/helper.js";
+import { deleteFile, uploadFile } from "../utils/cloudinary.js";
 
 class TeamMemberController {
   static async index(req, res) {
@@ -53,18 +54,17 @@ class TeamMemberController {
         throw Error;
       }
       console.log(req.file.path);
+      const resultFile = await uploadFile(file.path);
       const teamMemberObj = {
-        ...body,
-        storage_imagelink: req.file.path,
-        member_imagelink: `http://localhost:5000/${
-          req.file.path.split("\\")[1]
-        }`,
+        member_name: body.member_name,
+        member_position: body.member_position,
+        member_imagelink: resultFile?.url,
       };
       const validator = vine.compile(teamMemberSchema);
       const payload = await validator.validate(teamMemberObj);
       console.log("payload", payload);
       const data = await prisma.teammember.create({
-        data: payload,
+        data: { ...payload, storage_imagelink: JSON.stringify(resultFile) },
       });
       //   console.log("data", data);
       if (data) {
@@ -73,7 +73,15 @@ class TeamMemberController {
           data: data,
         });
       } else {
-        removeFile(req.file.path);
+        try {
+          deleteFile(resultFile);
+        } catch (deleteError) {
+          console.error("Error deleting file:", deleteError);
+          return res.status(500).json({
+            message: "Error deleting file",
+            error: deleteError.message,
+          });
+        }
         throw Error;
       }
     } catch (error) {
@@ -93,7 +101,16 @@ class TeamMemberController {
         },
       });
       // console.log(data);
-      removeFile(data.storage_imagelink);
+      const parsedData = JSON.parse(data.storage_imagelink);
+      try {
+        deleteFile(parsedData);
+      } catch (deleteError) {
+        console.error("Error deleting file:", deleteError);
+        return res.status(500).json({
+          message: "Error deleting file",
+          error: deleteError.message,
+        });
+      }
 
       await prisma.teammember
         .delete({

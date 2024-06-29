@@ -2,6 +2,7 @@ import vine from "@vinejs/vine";
 import prisma from "../config/db.config.js";
 import { servicePackageSchema } from "../validation/ServicePackageValidation.js";
 import { removeFile } from "../utils/helper.js";
+import { deleteFile, uploadFile } from "../utils/cloudinary.js";
 
 class ServicePackageController {
   static async index(req, res) {
@@ -52,29 +53,35 @@ class ServicePackageController {
       if (!file) {
         throw Error;
       }
-      console.log(req.file.path);
+      // console.log(req.file.path);
+      const resultFile = await uploadFile(file.path);
+      console.log("result file in cloudinary+++++++++++++++", resultFile);
+      const convertedResultFile = JSON.stringify(resultFile);
+      console.log("converted json++++++++++++++++++++", convertedResultFile);
+
       const servicePackageObject = {
         ...body,
-        storage_imagelink: req.file.path,
-        service_package_imageLink: `http://localhost:5000/${
-          req.file.path.split("\\")[1]
-        }`,
+        service_package_imageLink: resultFile.url,
+        // storage_imagelink: resultFile ?? {},
       };
+      console.log("servicePackageObject", servicePackageObject);
       const validator = vine.compile(servicePackageSchema);
       const payload = await validator.validate(servicePackageObject);
-      console.log("payload", payload);
+      console.log(payload);
+      // res.status(200).json({
+      //   message: "ServicePackage added",
+      //   data: servicePackageObject,
+      // });
+      // console.log("payload", payload);
       const data = await prisma.servicepackage.create({
-        data: payload,
+        data: { ...payload, storage_imagelink: convertedResultFile },
       });
-      console.log("data", data);
+      console.log("pushed data to db", data);
       if (data) {
         res.status(201).json({
           message: "Service Package Added",
           data: data,
         });
-      } else {
-        removeFile(req.file.path);
-        throw Error;
       }
     } catch (error) {
       res.status(400).json({
@@ -92,8 +99,17 @@ class ServicePackageController {
           id: servicePackageId,
         },
       });
-
-      removeFile(data.storage_imagelink);
+      const revertedFile = JSON.parse(data.storage_imagelink);
+      console.log(revertedFile);
+      try {
+        deleteFile(revertedFile);
+      } catch (deleteError) {
+        console.error("Error deleting file:", deleteError);
+        return res.status(500).json({
+          message: "Error deleting file",
+          error: deleteError.message,
+        });
+      }
 
       await prisma.servicepackage
         .delete({
