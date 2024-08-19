@@ -149,19 +149,22 @@ class ClientController {
           id: clientId,
         },
       });
-      const parsedImageLink = JSON.parse(found.client_image);
       // console.log(parsedImageLink);
 
       if (found) {
         if (file) {
-          try {
-            deleteFile(parsedImageLink);
-          } catch (deleteError) {
-            console.error("Error deleting file:", deleteError);
-            return res.status(500).json({
-              message: "Error deleting file",
-              error: deleteError.message,
-            });
+          if (found.client_image !== null) {
+            const parsedImageLink = JSON.parse(found.client_image);
+
+            try {
+              deleteFile(parsedImageLink);
+            } catch (deleteError) {
+              console.error("Error deleting file:", deleteError);
+              return res.status(500).json({
+                message: "Error deleting file",
+                error: deleteError.message,
+              });
+            }
           }
           const resultFile = await uploadFile(file.path);
           const modifiedPayload = {

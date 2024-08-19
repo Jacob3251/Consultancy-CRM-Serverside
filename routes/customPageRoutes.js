@@ -8,7 +8,11 @@ router.get("/", CustomPageController.index);
 // router.get("/pageByCat", CustomPageController.showByCategory);
 router.post("/", uploadMultiple.array("files", 3), CustomPageController.create);
 router.get("/:id", CustomPageController.show);
-router.put("/:id", CustomPageController.update);
+router.put(
+  "/:id",
+  uploadMultiple.array("files", 3),
+  CustomPageController.update
+);
 router.delete("/:id", CustomPageController.delete);
 
 export default router;

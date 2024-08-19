@@ -253,3 +253,12 @@ model progress {
   report   String
   clientId String
 }
+
+model aboutUs {
+  id                 String @id @unique @default("a3f45bcd6789ef12a4c56b789ef01234a5b6789cd")
+  pageDetail         String @default("")
+  missionTitle       String @default("")
+  missionDescription String @default("")
+  visionTitle        String @default("")
+  visionDescription  String @default("")
+}

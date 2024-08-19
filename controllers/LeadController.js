@@ -120,19 +120,22 @@ class LeadController {
           id: leadId,
         },
       });
-      const parsedImageLink = JSON.parse(found.lead_image);
       // console.log(parsedImageLink);
-
+      
       if (found) {
         if (file) {
-          try {
-            deleteFile(parsedImageLink);
-          } catch (deleteError) {
-            console.error("Error deleting file:", deleteError);
-            return res.status(500).json({
-              message: "Error deleting file",
-              error: deleteError.message,
-            });
+          if(found.lead_image !== ""){
+            const parsedImageLink = JSON.parse(found.lead_image);
+
+            try {
+              deleteFile(parsedImageLink);
+            } catch (deleteError) {
+              console.error("Error deleting file:", deleteError);
+              return res.status(500).json({
+                message: "Error deleting file",
+                error: deleteError.message,
+              });
+            }
           }
           const resultFile = await uploadFile(file.path);
           const modifiedPayload = {
@@ -202,9 +205,13 @@ class LeadController {
           type: "LEADS",
         },
       });
+      if (attachmentData) {
+        console.log("Found Attachments", attachmentData);
+      }
       if (leadData) {
         const { lead_image } = leadData;
-        const parsedLeadImage = JSON.parse(lead_image);
+        console.log("leadImage", lead_image);
+        const parsedLeadImage = lead_image === "" ? "" : JSON.parse(lead_image);
         res.status(200).json({
           message: "Lead Found",
           data: {

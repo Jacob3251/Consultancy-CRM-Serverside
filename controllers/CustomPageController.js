@@ -177,9 +177,214 @@ class CustomPageController {
     // });
   }
   static async update(req, res) {
-    res.send({
-      message: "data received",
-    });
+    try {
+      const id = req.params.id;
+      const body = req.body;
+      const file = req.files;
+      // finding out the existing data
+      const customPageExists = await prisma.page.findUnique({
+        where: {
+          siteUrl: id,
+        },
+      });
+
+      if (!customPageExists) {
+        return res.status(400).json({
+          message: "Invalid request",
+        });
+      }
+      // setting out the pageId for using when updating the page information
+      const pageId = customPageExists.id;
+
+      const parsedPageData = JSON.parse(customPageExists.pageData);
+
+      console.log(file);
+      const {
+        title,
+        category,
+        siteUrl,
+        metaTitle,
+        pageData,
+        metaDescription,
+        metaKeywords,
+      } = body;
+
+      // for only data change **********************************
+      let temp;
+      if (file.length === 0) {
+        const newtitle = JSON.parse(title);
+        const newcategory = JSON.parse(category);
+        const newsiteUrl = JSON.parse(siteUrl);
+        const newmetaTitle = JSON.parse(metaTitle);
+        const newpageData = JSON.parse(pageData);
+        const { pageHeading, pageDetail } = newpageData;
+        const newmetaDescription = JSON.parse(metaDescription);
+        const newmetaKeywords = JSON.parse(metaKeywords);
+
+        const payload = {
+          pageTitle: newtitle,
+          pageData: JSON.stringify({
+            ...newpageData,
+            pageHeading: {
+              ...pageHeading,
+              banner: parsedPageData.pageHeading.banner,
+            },
+            pageDetail: {
+              ...pageDetail,
+              images: parsedPageData.pageDetail.images,
+            },
+          }),
+          siteUrl: newsiteUrl,
+          category: newcategory,
+          metaTitle: newmetaTitle,
+          metaDiscription: newmetaDescription,
+          metaKeywords: newmetaKeywords,
+        };
+        console.log(payload);
+
+        await prisma.page
+          .update({
+            data: payload,
+            where: {
+              id: pageId,
+            },
+          })
+          .then((data) => {
+            console.log("page updated");
+          });
+        temp = JSON.parse(payload.pageData);
+      }
+
+      if (file.length > 0) {
+        // for images
+        // firstly deleting the previously existing images
+        try {
+          if (file.length === 3) {
+            deleteFile(parsedPageData.pageHeading.banner.fileInfo);
+            deleteFile(parsedPageData.pageDetail.images[0].fileInfo);
+            deleteFile(parsedPageData.pageDetail.images[1].fileInfo);
+          } else if (file.length === 2) {
+            deleteFile(parsedPageData.pageDetail.images[0].fileInfo);
+            deleteFile(parsedPageData.pageDetail.images[1].fileInfo);
+          } else {
+            deleteFile(parsedPageData.pageHeading.banner.fileInfo);
+          }
+        } catch (deleteError) {
+          console.error("Error deleting file:", deleteError);
+          return res.status(500).json({
+            message: "Error deleting file",
+            error: deleteError.message,
+          });
+        }
+        // adding the new images
+        let resultArr = [];
+        if (file.length === 3) {
+          const bannerResult = await uploadFile(file[0]?.path);
+          const detailImageResult1 = await uploadFile(file[1]?.path);
+          const detailImageResult2 = await uploadFile(file[2]?.path);
+          resultArr.push(bannerResult, detailImageResult1, detailImageResult2);
+        } else if (file.length === 2) {
+          const detailImageResult1 = await uploadFile(file[0]?.path);
+          const detailImageResult2 = await uploadFile(file[1]?.path);
+          resultArr.push(detailImageResult1, detailImageResult2);
+        } else {
+          const bannerResult = await uploadFile(file[0]?.path);
+          resultArr.push(bannerResult);
+        }
+        // setting the new updated payload with banner image details
+        const newtitle = JSON.parse(title);
+        const newcategory = JSON.parse(category);
+        const newsiteUrl = JSON.parse(siteUrl);
+        const newmetaTitle = JSON.parse(metaTitle);
+        const newpageData = JSON.parse(pageData);
+        const { pageHeading, pageDetail } = newpageData;
+        const newmetaDescription = JSON.parse(metaDescription);
+        const newmetaKeywords = JSON.parse(metaKeywords);
+
+        const payload = {
+          pageTitle: newtitle,
+          pageData: JSON.stringify({
+            ...newpageData,
+            pageHeading: {
+              ...pageHeading,
+              banner: {
+                fileLink:
+                  resultArr.length === 2
+                    ? parsedPageData.pageHeading.banner.fileLink
+                    : resultArr[0].url,
+                fileInfo:
+                  resultArr.length === 2
+                    ? { ...parsedPageData.pageHeading.banner.fileInfo }
+                    : {
+                        ...resultArr[0],
+                      },
+              },
+            },
+            pageDetail: {
+              ...pageDetail,
+              images:
+                resultArr.length === 3
+                  ? [
+                      {
+                        fileLink: resultArr[1].url,
+                        fileInfo: { ...resultArr[1] },
+                      },
+                      {
+                        fileLink: resultArr[2].url,
+                        fileInfo: { ...resultArr[2] },
+                      },
+                    ]
+                  : resultArr.length === 2
+                  ? [
+                      {
+                        fileLink: resultArr[0].url,
+                        fileInfo: { ...resultArr[0] },
+                      },
+                      {
+                        fileLink: resultArr[1].url,
+                        fileInfo: { ...resultArr[1] },
+                      },
+                    ]
+                  : parsedPageData.pageDetail.images,
+            },
+          }),
+          siteUrl: newsiteUrl,
+          category: newcategory,
+          metaTitle: newmetaTitle,
+          metaDiscription: newmetaDescription,
+          metaKeywords: newmetaKeywords,
+        };
+
+        // updating the data
+
+        await prisma.page
+          .update({
+            data: payload,
+            where: {
+              id: pageId,
+            },
+          })
+          .then((data) => {
+            console.log("page updated");
+          });
+        temp = JSON.parse(payload.pageData);
+      }
+
+      // const { pageData, ...rest } = customPageExists;
+      // const parsedPageData = JSON.parse(pageData);
+
+      // console.log("body", body);
+
+      res.send({
+        message: "page update route",
+        // data: rest ?? undefined,
+        parsedPageData: temp,
+      });
+    } catch (error) {
+      res.status(400).json({
+        message: error.message,
+      });
+    }
   }
   static async delete(req, res) {
     try {

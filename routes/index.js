@@ -1,6 +1,7 @@
 import { Router } from "express";
 import UserRoutes from "./userRoutes.js";
 import PermissionRoutes from "./permissionRoutes.js";
+import AboutUsRoutes from "./aboutUsRoutes.js";
 import RoleRoutes from "./roleRoutes.js";
 import LeadRoutes from "./leadRoutes.js";
 import ClientRoutes from "./clientRoutes.js";
@@ -31,6 +32,7 @@ const router = Router();
 
 router.use("/api/user", UserRoutes);
 router.use("/api/permission", PermissionRoutes);
+router.use("/api/aboutus", AboutUsRoutes);
 router.use("/api/role", RoleRoutes);
 router.use("/api/lead", LeadRoutes);
 router.use("/api/client", ClientRoutes);
